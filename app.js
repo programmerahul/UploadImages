@@ -7,6 +7,7 @@ const { GridFsStorage } = require("multer-gridfs-storage");
 const Grid = require("gridfs-stream");
 const methodOverride = require("method-override");
 const bodyparser = require("body-parser");
+
 const app = express();
 
 //middleware
@@ -19,13 +20,22 @@ const mongoUri = "mongodb://localhost:27017";
 //create mongo connection
 const conn = mongoose.createConnection(mongoUri);
 //init gridfs stream
-let gfs;
+// let gfs;
+// conn.once("open", () => {
+//   //initialize stream
+//   gfs = Grid(conn.db, mongoose.mongo);
+//   gfs.collection("uploads");
+// });
+
+let gfs, gridfsBucket;
 conn.once("open", () => {
-  //initialize stream
+  gridfsBucket = new mongoose.mongo.GridFSBucket(conn.db, {
+    bucketName: "uploads",
+  });
+
   gfs = Grid(conn.db, mongoose.mongo);
   gfs.collection("uploads");
 });
-
 //create storage engine
 const storage = new GridFsStorage({
   url: mongoUri,
@@ -50,14 +60,30 @@ const upload = multer({ storage });
 //@route GET /
 //@desc Loads form
 app.get("/", (req, res) => {
-  //res.render("index");
-  res.redirect("/");
+  gfs.files.find().toArray((err, files) => {
+    //check if files
+    if (!files || files.length === 0) {
+      res.render("index", { files: false });
+    } else {
+      files.map((file) => {
+        if (
+          file.contentType === "image/jpeg" ||
+          file.contentType === "image/png"
+        ) {
+          file.isImage = true;
+        } else {
+          file.isImage = false;
+        }
+      });
+      res.render("index", { files: files });
+    }
+  });
 });
 
 //@route POST /upload
 //@desc uploads file to db
 app.post("/upload", upload.single("file"), (req, res) => {
-  res.json({ file: req.file });
+  res.redirect("/").json({ file: req.file });
 });
 
 //@route GET /files
@@ -76,7 +102,7 @@ app.get("/files", (req, res) => {
 });
 
 //@route GET /files/:filename
-//desc display all files in json
+//desc display single file
 app.get("/files/:filename", (req, res) => {
   gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
     //check if files
@@ -90,5 +116,45 @@ app.get("/files/:filename", (req, res) => {
   });
 });
 
+//@route GET /image/:filename
+//desc display image
+
+app.get("/image/:filename", (req, res) => {
+  gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
+    //check if files
+    if (!file || file.length === 0) {
+      res.status(404).json({
+        err: "No file exists",
+      });
+    }
+    //check if image
+    // if (file.contentType === "image/jpeg" || file.contentType === "img/png") {
+    //   //read output to browser
+    //   const readstream = gfs.createReadStream(file.filename);
+    //   readstream.pipe(res);
+    // } else {
+    //   res.status(404).json({
+    //     err: "not an image",
+    //   });
+    // }
+    if (file.contentType === "image/jpeg" || file.contentType === "image/png") {
+      const readStream = gridfsBucket.openDownloadStream(file._id);
+      readStream.pipe(res);
+    }
+  });
+});
+
+//@route DELETE /files/:id
+//@desc Delete file
+app.delete("/files/:filename", async (req, res) => {
+  const file = await gfs.files.findOne({ filename: req.params.filename });
+  const gsfb = new mongoose.mongo.GridFSBucket(conn.db, {
+    bucketName: "uploads",
+  });
+  gsfb.delete(file._id, function (err, gridStore) {
+    if (err) return res.status(400);
+    res.redirect("/");
+  });
+});
 const port = 5000;
 app.listen(port, () => console.log(`listening on port ${port}`));
