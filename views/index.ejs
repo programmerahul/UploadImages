@@ -22,7 +22,7 @@
     <div class="container">
       <div class="row">
         <div class="col-md-6 m-auto">
-          <h1 class="text-center display-4 my-4">Mongo file uploads</h1>
+          <h1 class="text-center display-4 my-4">UPLOAD IMAGES</h1>
           <form action="/upload" method="POST" enctype="multipart/form-data">
             <div class="input-group mb-3">
               <input
@@ -32,29 +32,32 @@
                 class="input-group-input form-control"
               />
             </div>
-            <input
-              type="submit"
-              value="Submit"
-              class="btn btn-primary btn-block"
-            />
+            <div style="display:flex;justify-content: center;">
+              <input
+                type="submit"
+                value="Submit"  
+                class="btn btn-primary col-6"
+              />
+            </div>
           </form>
           <hr />
         </div>
       </div>
-      <%if(files){%> <% files.forEach((file,index)=>{ %> 
+      <%if(files){%> <% files.reverse().forEach((file,index)=>{ %> 
         <%if(index%3==0) {%> 
             <div class="row">
         <% }%>
-          <div class="col">
+          <div class="col-md-6 m-auto ">
           <div  class="card card-body mb-3">
             <% if(file.isImage){%>
-            <img src="image/<%= file.filename %>" alt="" />
+            <img  style="object-fit: contain; max-height:50vh;" src="image/<%= file.filename %>" alt="" />
             <% }else{%> <%= file.filename%> <% }%>
             <form
+            style="display: flex;justify-content: center;"
               method="POST"
               action="/files/<%= file.filename%>?_method=DELETE"
             >
-              <button class="btn btn-danger btn-block mt-4">Delete</button>
+              <button class="btn btn-danger btn-block mt-4 col-6">Delete</button>
             </form>
           </div>
           </div>
