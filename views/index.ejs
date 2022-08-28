@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mongo file upload</title>
+    <title>UPLOAD IMAGES</title>
     <!-- CSS only -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"
@@ -39,8 +39,14 @@
             />
           </form>
           <hr />
-          <%if(files){%> <% files.forEach(function(file){ %>
-          <div class="card card-body mb-3">
+        </div>
+      </div>
+      <%if(files){%> <% files.forEach((file,index)=>{ %> 
+        <%if(index%3==0) {%> 
+            <div class="row">
+        <% }%>
+          <div class="col">
+          <div  class="card card-body mb-3">
             <% if(file.isImage){%>
             <img src="image/<%= file.filename %>" alt="" />
             <% }else{%> <%= file.filename%> <% }%>
@@ -51,10 +57,14 @@
               <button class="btn btn-danger btn-block mt-4">Delete</button>
             </form>
           </div>
+          </div>
+          <%if(index%3===2) {%> 
+            </div>
+          <% }%>
           <%})%> <% }else {%>
           <p>No files to show</p>
           <% }%>
-        </div>
+        
       </div>
     </div>
     <!-- JavaScript Bundle with Popper -->

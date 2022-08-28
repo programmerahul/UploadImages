@@ -16,7 +16,8 @@ app.use(methodOverride("_method"));
 app.set("view engine", "ejs");
 
 //mongo uri
-const mongoUri = "mongodb://localhost:27017";
+const mongoUri =
+  "mongodb+srv://rahul:rahulcluster@images.xa4kz7z.mongodb.net/?retryWrites=true&w=majority";
 //create mongo connection
 const conn = mongoose.createConnection(mongoUri);
 //init gridfs stream
