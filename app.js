@@ -7,6 +7,7 @@ const { GridFsStorage } = require("multer-gridfs-storage");
 const Grid = require("gridfs-stream");
 const methodOverride = require("method-override");
 const bodyparser = require("body-parser");
+const config = require("config");
 
 const app = express();
 
@@ -16,8 +17,8 @@ app.use(methodOverride("_method"));
 app.set("view engine", "ejs");
 
 //mongo uri
-const mongoUri =
-  "mongodb+srv://rahul:rahulcluster@images.xa4kz7z.mongodb.net/?retryWrites=true&w=majority";
+const mongoUri = config.get("db");
+
 //create mongo connection
 const conn = mongoose.createConnection(mongoUri);
 //init gridfs stream
