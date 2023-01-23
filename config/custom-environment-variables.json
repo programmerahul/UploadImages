@@ -1,3 +1,3 @@
 {
-  "db": "db"
+  "db": "mongodb+srv://rahul:<rahulcluster>@images.xa4kz7z.mongodb.net/?retryWrites=true&w=majority"
 }

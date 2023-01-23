@@ -7,7 +7,7 @@ const { GridFsStorage } = require("multer-gridfs-storage");
 const Grid = require("gridfs-stream");
 const methodOverride = require("method-override");
 const bodyparser = require("body-parser");
-const config = require("config");
+// const config = require("config");
 
 const app = express();
 
@@ -17,8 +17,8 @@ app.use(methodOverride("_method"));
 app.set("view engine", "ejs");
 
 //mongo uri
-const mongoUri = config.get("db");
-
+//const mongoUri = config.get("db");
+const mongoUri = "mongodb+srv://rahul:rahulcluster@images.xa4kz7z.mongodb.net/?retryWrites=true&w=majority";
 //create mongo connection
 const conn = mongoose.createConnection(mongoUri);
 //init gridfs stream
@@ -47,7 +47,8 @@ const storage = new GridFsStorage({
         if (err) {
           return reject(err);
         }
-        const filename = buf.toString("hex") + path.extname(file.originalname);
+       const filename = buf.toString("hex") + path.extname(file.originalname);
+       console.log(filename)
         const fileInfo = {
           filename: filename,
           bucketName: "uploads",
